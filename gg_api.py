@@ -3,12 +3,65 @@ import sys
 import json
 
 from src import clean_tweets, sort_tweets, query_hosts, query_awards, process_tweets
-from src.queries import query_nominees_rahul
+from src.queries import query_nominees_rahul, query_best_dressed
 
 '''Version 0.35'''
 
-OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
-OFFICIAL_AWARDS_1819 = ['best motion picture - drama', 'best motion picture - musical or comedy', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best performance by an actress in a motion picture - musical or comedy', 'best performance by an actor in a motion picture - musical or comedy', 'best performance by an actress in a supporting role in any motion picture', 'best performance by an actor in a supporting role in any motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best motion picture - animated', 'best motion picture - foreign language', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best television series - musical or comedy', 'best television limited series or motion picture made for television', 'best performance by an actress in a limited series or a motion picture made for television', 'best performance by an actor in a limited series or a motion picture made for television', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best performance by an actress in a television series - musical or comedy', 'best performance by an actor in a television series - musical or comedy', 'best performance by an actress in a supporting role in a series, limited series or motion picture made for television', 'best performance by an actor in a supporting role in a series, limited series or motion picture made for television', 'cecil b. demille award']
+OFFICIAL_AWARDS_1315 = [
+    'cecil b. demille award',
+    'best motion picture - drama',
+    'best performance by an actress in a motion picture - drama',
+    'best performance by an actor in a motion picture - drama',
+    'best motion picture - comedy or musical',
+    'best performance by an actress in a motion picture - comedy or musical',
+    'best performance by an actor in a motion picture - comedy or musical',
+    'best animated feature film',
+    'best foreign language film',
+    'best performance by an actress in a supporting role in a motion picture',
+    'best performance by an actor in a supporting role in a motion picture',
+    'best director - motion picture',
+    'best screenplay - motion picture',
+    'best original score - motion picture',
+    'best original song - motion picture',
+    'best television series - drama',
+    'best performance by an actress in a television series - drama',
+    'best performance by an actor in a television series - drama',
+    'best television series - comedy or musical',
+    'best performance by an actress in a television series - comedy or musical',
+    'best performance by an actor in a television series - comedy or musical',
+    'best mini-series or motion picture made for television',
+    'best performance by an actress in a mini-series or motion picture made for television',
+    'best performance by an actor in a mini-series or motion picture made for television',
+    'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television',
+    'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
+
+OFFICIAL_AWARDS_1819 = [
+    'best motion picture - drama',
+    'best motion picture - musical or comedy',
+    'best performance by an actress in a motion picture - drama',
+    'best performance by an actor in a motion picture - drama',
+    'best performance by an actress in a motion picture - musical or comedy',
+    'best performance by an actor in a motion picture - musical or comedy',
+    'best performance by an actress in a supporting role in any motion picture',
+    'best performance by an actor in a supporting role in any motion picture',
+    'best director - motion picture',
+    'best screenplay - motion picture',
+    'best motion picture - animated',
+    'best motion picture - foreign language',
+    'best original score - motion picture',
+    'best original song - motion picture',
+    'best television series - drama',
+    'best television series - musical or comedy',
+    'best television limited series or motion picture made for television',
+    'best performance by an actress in a limited series or a motion picture made for television',
+    'best performance by an actor in a limited series or a motion picture made for television',
+    'best performance by an actress in a television series - drama',
+    'best performance by an actor in a television series - drama',
+    'best performance by an actress in a television series - musical or comedy',
+    'best performance by an actor in a television series - musical or comedy',
+    'best performance by an actress in a supporting role in a series, limited series or motion picture made for television',
+    'best performance by an actor in a supporting role in a series, limited series or motion picture made for television',
+    'cecil b. demille award']
 
 def get_hosts(year):
     '''Hosts is a list of one or more strings. Do NOT change the name
@@ -22,7 +75,7 @@ def get_awards(year):
     awards = query_awards.main(year)
     return awards
 
-def get_nominees(year, winner):
+def get_nominees(year):
     '''Nominees is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns.'''
@@ -33,7 +86,7 @@ def get_nominees(year, winner):
     else:
         process_tweets.main(year, award_tweets, sw)
 
-    person_nominees = query_nominees_rahul.main(year, OFFICIAL_AWARDS_1315)
+    person_nominees = query_nominees_rahul.main(year)
 
     nominees = {}
     for award in OFFICIAL_AWARDS_1315:
@@ -42,8 +95,6 @@ def get_nominees(year, winner):
             nominees[award] = person_nominees[award]
         else:
             nominees[award] = data[award]['nominees']
-        if winner not in nominees[award]:
-            nominees[award].append(winner)
     return nominees
 
 def get_winner(year):
@@ -87,13 +138,12 @@ def pre_ceremony():
     will use, and stores that data in your DB or in a json, csv, or
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns.'''
-    print('Beginning pre-ceremony queries...')
+    print('Beginning pre-ceremony processing...')
+    year = sys.argv[1]
+    if not os.path.exists('data/clean_gg' + year + '.json'):
+        clean_tweets.main(year)
 
-    for year in ['2013']:
-        if not os.path.exists('data/clean_gg' + year + '.lst'):
-            clean_tweets.main(year)
-
-    print('Pre-ceremony queries complete')
+    print('Pre-ceremony processing complete')
     return
 
 def main():
@@ -103,13 +153,18 @@ def main():
     run when grading. Do NOT change the name of this function or
     what it returns.'''
 
+    if len(sys.argv) != 2:
+        print('Invalid Year')
+        return
+
     year = sys.argv[1]
     print('Welcome to the %s Golden Globes!' % year)
+    award_list = OFFICIAL_AWARDS_1315 if year in ['2013', '2015'] else OFFICIAL_AWARDS_1819
 
-    # hosts = get_hosts(year)
-    # awards = get_awards(year)
-    hosts = []
-    awards = []
+    best_dressed = query_best_dressed.main(year)
+
+    hosts = get_hosts(year)
+    awards = get_awards(year)
 
     sorted_path = 'data/sorted_gg%s.json' % year
     if os.path.exists(sorted_path):
@@ -117,7 +172,7 @@ def main():
             award_tweets = json.load(f)
         f.close()
     else:
-        award_tweets = sort_tweets.main(year, OFFICIAL_AWARDS_1315)
+        award_tweets = sort_tweets.main(year, award_list)
         with open(sorted_path, 'w+') as f:
             json.dump(award_tweets, f)
         f.close()
@@ -133,16 +188,10 @@ def main():
     }
 
     winners = get_winner(year)
-    nominees = get_nominees(year)
+    nominees = get_nominees(year, winners, award_list)
     presenters = get_presenters(year)
-    # print(nominees.keys())
-    # print('-' * 40)
-    for award in OFFICIAL_AWARDS_1315:
-        # try:
-        #     print(nominees[award])
-        # except:
-        #     print(award)
-        #     continue
+
+    for award in award_list:
         show[award] = {
             'winner': winners[award],
             'nominees': nominees[award],
@@ -171,6 +220,4 @@ def view_results():
         print('\tPresenter:', data[award]['presenters'])
 
 if __name__ == '__main__':
-    # pre_ceremony()
-    # main()
-    view_results()
+    main()

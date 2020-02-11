@@ -6,6 +6,91 @@ from nltk.corpus import stopwords
 from nltk.tokenize import TweetTokenizer as tokenizer
 from string import punctuation
 
+def substringSieve(string_list):
+	string_list.sort(key=lambda s: len(s), reverse=True)
+	out = []
+	for s in string_list:
+		if not any([s in o for o in out]):
+			out.append(s)
+	return out
+
+def expand_awards(short_list):
+	# person awards - actor or actress
+	person = []
+	for i in short_list:
+		if 'act' in i:
+			person.append(i)
+	for i in range(0, len(person)):
+		person[i] = person[i].replace('best', 'best performance by an')
+		if 'motion' in person[i]:
+			person.append(person[i] + ' - comedy or musical')
+			person[i] = person[i] + ' - drama'
+
+	for i in range(0, len(person)):
+		if 'supporting' in person[i]:
+			person[i] = person[i].replace('supporting actor', 'actor in a supporting role')
+			person[i] = person[i].replace('supporting actress', 'actress in a supporting role')
+
+	for i in range(0, len(person)):
+		if 'supporting' in person[i]:
+			if '-' in person[i]:
+				person[i] = person[i].split(' -')[0]
+	for i in range(0, len(person)):
+		if 'tv' in person[i]:
+			person.append(person[i] + ' - comedy or musical')
+			person[i] = person[i].replace('tv', 'television series - drama')
+	for i in range(0, len(person)):
+		if 'tv' in person[i]:
+			person[i] = person[i].replace('tv', 'television series')
+
+	# film or picture
+	film_picture = []
+	for i in short_list:
+		if 'film' in i:
+			film_picture.append(i)
+		if 'motion picture' in i:
+			if not 'act' in i:
+				film_picture.append(i)
+		if 'television' in i:
+			if not 'act' in i:
+				film_picture.append(i)
+	for i in range(0, len(film_picture)):
+		if 'foreign film' in film_picture[i]:
+			film_picture[i] = film_picture[i].replace('foreign film', 'foreign language film')
+		if '- drama' in film_picture[i]:
+			film_picture.append(film_picture[i].replace('- drama', '- comedy or musical'))
+		if '- comedy or musical' in film_picture[i]:
+			film_picture.append(film_picture[i].replace('- comedy or musical', '- drama'))
+		if 'series' in film_picture[i]:
+			if not '- drama' in film_picture[i]:
+				film_picture.append(film_picture[i].replace('series', 'series - drama'))
+				film_picture[i] = film_picture[i].replace('series', 'series - comedy or musical')
+			if not '- comedy' in film_picture[i]:
+				film_picture.append(film_picture[i].replace('series', 'series - drama'))
+				film_picture[i] = film_picture[i].replace('series', 'series - comedy or musical')
+
+	# random awards
+	random = []
+	for i in short_list:
+		if 'direct' in i:
+			random.append(i)
+		if 'screenplay' in i:
+			random.append(i)
+		if 'score' in i:
+			random.append(i)
+		if 'song' in i:
+			random.append(i)
+	for n in range(0, len(random)):
+		if 'song' in random[n]:
+			if not 'original' in random[n]:
+				random[n] = random[n].replace('song', 'original song')
+		if 'score' in random[n]:
+			if not 'original' in random[n]:
+				random[n] = random[n].replace('score', 'original score')
+
+	new_awards = list(set(random)) + list(set(film_picture)) + list(set(person))
+	return new_awards
+
 def main(year):
 	print('\nSearching for awards...')
 
@@ -60,4 +145,4 @@ def main(year):
 	rankings = [(name, v) for name, v in sorted(award_candidates.items(), key=lambda item: item[1])]
 	rankings.reverse()
 
-	return [i[0] for i in rankings if i[1] > 80 and i[0]]
+	return expand_awards(substringSieve([i[0] for i in rankings[:25]]))

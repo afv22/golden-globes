@@ -30,8 +30,6 @@ def main(tweets, award, sw, is_person):
 				for phrase in helpers.ngrams(clean_tweet, i):
 					front = lower_raw.index(phrase[0])
 					back = lower_raw.index(phrase[-1]) + 1
-					# if is_person and back - front != i:
-					# 	continue
 
 					name = ' '.join(lower_raw[front:back])
 

@@ -7,6 +7,7 @@ sw = set(stopwords.words('english'))
 from src import helpers
 
 def main(year):
+	print('\nSearching for hosts...')
 	with open('data/clean_gg' + year + '.json', 'r') as f:
 		all_tweets = json.load(f)
 	f.close()
@@ -14,7 +15,6 @@ def main(year):
 	host_candidates = {}
 	tweets = [tweet.split() for tweet in set([' '.join(tweet['clean']) for tweet in all_tweets])]
 
-	print('\nSearching for hosts...')
 	size = len(tweets)
 	for n, tweet in enumerate(tweets):
 		helpers.prog_print(n, size)
@@ -37,7 +37,7 @@ def main(year):
 
 	hosts = [rankings[0][0]]
 	ptr = 1
-	cutoff = rankings[0][1] * 0.8
+	cutoff = rankings[0][1] * 0.85
 	while ptr < len(rankings) and rankings[ptr][1] > cutoff:
 		hosts.append(rankings[ptr][0])
 		ptr += 1
