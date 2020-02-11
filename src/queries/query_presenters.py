@@ -4,6 +4,7 @@ from src import helpers
 from nltk.tokenize import TweetTokenizer as tokenizer
 
 def main(tweets, nominees, award, sw):
+	#key words indicating presenters
 	presenter_candidates = {}
 	presenter_sw = ['present', 'presenter', 'presentation', 'presenting', 'presenta', 'presents',
 					'introduce', 'introduced', 'introducing',
