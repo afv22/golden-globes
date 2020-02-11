@@ -4,6 +4,8 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import TweetTokenizer as tokenizer
 
+#for award names and tweets
+#ex: comedy and drama should not be in same tweet or award
 def only_in_one(synonyms, l1, l2):
 	check1 = False
 	check2 = False
@@ -12,6 +14,7 @@ def only_in_one(synonyms, l1, l2):
 		check2 = check2 or word in l2
 	return check1 != check2
 
+#take out stop words
 def scrub_award(award):
 	english_stop = set(stopwords.words('english'))
 	gg_stop = ['best', 'performance', 'motion', 'picture', 'made', 'original']
