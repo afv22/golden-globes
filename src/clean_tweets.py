@@ -8,6 +8,7 @@ from string import punctuation
 from src.helpers import prog_print
 from datetime import datetime
 
+#take out different sets of stopwords
 english_stop = set(stopwords.words('english'))
 gg_stop = ['best', 'goldenglobes', '#goldenglobes', '#goldenglobe', 'golden', 'globes', 'globe']
 twitter_stop = ['&amp;', 'rt']
