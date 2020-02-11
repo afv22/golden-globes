@@ -32,6 +32,7 @@ def main(year):
 
 	clean_bigrams = []
 
+	#only look at tweets with best & dressed
 	word_set = set(['best', 'dressed'])
 
 	for bigram_list in best_dressed:

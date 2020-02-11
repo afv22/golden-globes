@@ -21,7 +21,8 @@ def main(year):
 
 		if not any([hw in tweet for hw in ['host', 'Host', 'hosts', 'Hosts']]):
 			continue
-
+	
+		#get only proper nouns
 		tagged = nltk.pos_tag(tweet)
 		bigrams = [tagged[i:i+2] for i in range(len(tagged)-1)]
 		for bigram in bigrams:
@@ -35,6 +36,7 @@ def main(year):
 	rankings = [[k, v] for k, v in sorted(host_candidates.items(), key=lambda item: item[1])]
 	rankings.reverse()
 
+	#get top name(s) from rankings
 	hosts = [rankings[0][0]]
 	ptr = 1
 	cutoff = rankings[0][1] * 0.85

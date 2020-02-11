@@ -110,13 +110,15 @@ def main(year):
 		unclean_tokens = tokenizer().tokenize(text)
 		clean_tweets_noms_13.append(clean_tweet(unclean_tokens))
 
+	#creates subset of tweets based on query from given award
 	def subset_noms(query, cleaned_tweets):
 		noms = []
 		for tweet in cleaned_tweets:
 			if all([word in tweet for word in query]):
 				noms.append(tweet)
 		return noms
-
+	
+	#gets bigrams from tweet
 	def bi_grams(subset):
 		bi_grams = []
 		for tweet in subset:
@@ -124,6 +126,7 @@ def main(year):
 		flat = [item for sublist in bi_grams for item in sublist]
 		return flat
 
+	#filters based on proper nouns and title case
 	def propers(flat_list):
 		proper = []
 		for i in range(0, len(flat_list)):
@@ -132,7 +135,8 @@ def main(year):
 				if (not (pos[0][0].isupper()) and (not (pos[1][0].isupper()))):
 					proper.append(flat_list[i])
 		return proper
-
+	
+	#filters based on if person according to spaCy named entity recognition package
 	def person_filter(ranked_list):
 		updated_person_noms = []
 		for i in ranked_list:
@@ -149,6 +153,7 @@ def main(year):
 				updated_person_noms.append(i)
 		return updated_person_noms
 
+	#combines spaCy named entity recognition filter and gender filter to select names based on gender
 	def gender_person_filter(ranked_list, gender):
 		updated_person_noms = []
 		for i in range(0, len(ranked_list)):
