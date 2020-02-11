@@ -92,8 +92,6 @@ def expand_awards(short_list):
 	return new_awards
 
 def main(year):
-	print('\nSearching for awards...')
-
 	# Import twitter data
 	with open('data/gg%s.json' % year, 'r') as f:
 		data = json.load(f)
@@ -108,11 +106,7 @@ def main(year):
 
 	award_candidates = {}
 
-	size = len(set([d['text'] for d in data]))
-
 	for n, tweet in enumerate(set([d['text'] for d in data])):
-		helpers.prog_print(n, size)
-
 		# Generate all relevant forms of the tweet
 		tkn_tweet = tokenizer().tokenize(tweet)
 		lower_tweet = [tkn.lower() for tkn in tkn_tweet]
