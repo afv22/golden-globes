@@ -135,7 +135,12 @@ def main(year):
 				front, back = lower_tweet.index('best'), lower_tweet.index(clean_tweet[ind+i-1])
 
 				# Piece it together and add it to the candidates list
-				name = ' '.join(lower_tweet[front:back+1])
+				name_tkns = lower_tweet[front:back+1]
+				for n in range(len(name_tkns)):
+					if not name_tkns[n].isalpha():
+						name_tkns = name_tkns[:n]
+						break
+				name = ' '.join(name_tkns)
 				if name in award_candidates:
 					award_candidates[name] += 1
 				else:
@@ -145,4 +150,4 @@ def main(year):
 	rankings = [(name, v) for name, v in sorted(award_candidates.items(), key=lambda item: item[1])]
 	rankings.reverse()
 
-	return expand_awards(substringSieve([i[0] for i in rankings[:25]]))
+	return expand_awards(substringSieve([i[0] for i in rankings[:40]]))
