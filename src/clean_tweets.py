@@ -35,14 +35,12 @@ def main(year):
 	tweets = []
 	size = len(db)
 
-	start = datetime.now()
 	for n, tweet in enumerate(db):
 		prog_print(n, size, 40)
 		tweets.append({
 			'clean': clean_tweet(tokenizer().tokenize(tweet['text'])),
 			'raw': tokenizer().tokenize(tweet['text'])})
 
-	print('Time Elapsed:', (datetime.now() - start).seconds // 60)
 	print('Saving cleaned tweets...')
 	with open('data/clean_gg' + year + '.json', 'w+') as clean_file:
 		json.dump(tweets, clean_file)

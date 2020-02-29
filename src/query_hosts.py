@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import nltk
@@ -8,7 +9,9 @@ from src import helpers
 
 def main(year):
 	print('\nSearching for hosts...')
-	with open('data/clean_gg' + year + '.json', 'r') as f:
+
+	clean_path = 'data/clean_gg' + year + '.json'
+	with open(clean_path, 'r') as f:
 		all_tweets = json.load(f)
 	f.close()
 

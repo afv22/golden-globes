@@ -66,7 +66,11 @@ OFFICIAL_AWARDS_1819 = [
 def get_hosts(year):
     '''Hosts is a list of one or more strings. Do NOT change the name
     of this function or what it returns.'''
-    return []
+
+    clean_path = 'data/clean_gg' + year + '.json'
+    if not os.path.exists(clean_path):
+        pre_ceremony()
+
     hosts = query_hosts.main(year)
     return hosts
 
@@ -80,18 +84,33 @@ def get_nominees(year):
     '''Nominees is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns.'''
-    return {}
-    if os.path.exists('results/partial_gg%s.json' % year):
-        with open('results/partial_gg%s.json' % year, 'r') as f:
-            data = json.load(f)
-        f.close()
-    else:
-        process_tweets.main(year, award_tweets, sw)
+
+    award_list = OFFICIAL_AWARDS_1315 if year in ['2013', '2015'] else OFFICIAL_AWARDS_1819
+
+    clean_path = 'data/clean_gg' + year + '.json'
+    if not os.path.exists(clean_path):
+        pre_ceremony()
+
+    sorted_path = 'data/sorted_gg' + year + '.json'
+    if not os.path.exists(sorted_path):
+        sort_tweets.main(year, award_list)
+
+    with open(sorted_path, 'r') as f:
+        award_tweets = json.load(f)
+    f.close()
+
+    processed_path = 'results/partial_gg%s.json' % year
+    if not os.path.exists(processed_path):
+        process_tweets.main(year, award_tweets)
+
+    with open(processed_path, 'r') as f:
+        data = json.load(f)
+    f.close()
 
     person_nominees = query_nominees_rahul.main(year)
 
     nominees = {}
-    for award in OFFICIAL_AWARDS_1315:
+    for award in award_list:
         is_person = any([title in award for title in ['actor', 'actress', 'director', 'screenplay', 'original', 'cecil']])
         if is_person:
             nominees[award] = person_nominees[award]
@@ -103,13 +122,26 @@ def get_winner(year):
     '''Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns.'''
-    return {}
-    if os.path.exists('results/partial_gg%s.json' % year):
-        with open('results/partial_gg%s.json' % year, 'r') as f:
-            data = json.load(f)
-        f.close()
-    else:
-        process_tweets.main(year, award_tweets, sw)
+
+    clean_path = 'data/clean_gg' + year + '.json'
+    if not os.path.exists(clean_path):
+        pre_ceremony()
+
+    sorted_path = 'data/sorted_gg' + year + '.json'
+    if not os.path.exists(sorted_path):
+        sort_tweets.main(year, award_list)
+
+    with open(sorted_path, 'r') as f:
+        award_tweets = json.load(f)
+    f.close()
+
+    processed_path = 'results/partial_gg%s.json' % year
+    if not os.path.exists(processed_path):
+        process_tweets.main(year, award_tweets)
+
+    with open(processed_path, 'r') as f:
+        data = json.load(f)
+    f.close()
 
     winners = {}
     for award in data:
@@ -122,13 +154,26 @@ def get_presenters(year):
     '''Presenters is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change the
     name of this function or what it returns.'''
-    return {}
-    if os.path.exists('results/partial_gg%s.json' % year):
-        with open('results/partial_gg%s.json' % year, 'r') as f:
-            data = json.load(f)
-        f.close()
-    else:
-        process_tweets.main(year, award_tweets, sw)
+
+    clean_path = 'data/clean_gg' + year + '.json'
+    if not os.path.exists(clean_path):
+        pre_ceremony()
+
+    sorted_path = 'data/sorted_gg' + year + '.json'
+    if not os.path.exists(sorted_path):
+        sort_tweets.main(year, award_list)
+
+    with open(sorted_path, 'r') as f:
+        award_tweets = json.load(f)
+    f.close()
+
+    processed_path = 'results/partial_gg%s.json' % year
+    if not os.path.exists(processed_path):
+        process_tweets.main(year, award_tweets)
+
+    with open(processed_path, 'r') as f:
+        data = json.load(f)
+    f.close()
 
     presenters = {}
     for award in data:
@@ -163,40 +208,36 @@ def main():
 
     year = sys.argv[1]
     print('Welcome to the %s Golden Globes!' % year)
+    if os.path.exists('results/gg' + year + '.json'):
+        return
+
     award_list = OFFICIAL_AWARDS_1315 if year in ['2013', '2015'] else OFFICIAL_AWARDS_1819
 
-    # best_dressed = query_best_dressed.main(year)
+    best_dressed = query_best_dressed.main(year)
 
-    # hosts = get_hosts(year)
+    hosts = get_hosts(year)
     awards = get_awards(year)
 
-    for a in awards:
-        print(a)
-    sys.exit()
+    sorted_path = 'data/sorted_gg' + year + '.json'
+    if not os.path.exists(sorted_path):
+        sort_tweets.main(year, award_list)
 
-    sorted_path = 'data/sorted_gg%s.json' % year
-    if os.path.exists(sorted_path):
-        with open(sorted_path, 'r') as f:
-            award_tweets = json.load(f)
-        f.close()
-    else:
-        award_tweets = sort_tweets.main(year, award_list)
-        with open(sorted_path, 'w+') as f:
-            json.dump(award_tweets, f)
-        f.close()
+    with open(sorted_path, 'r') as f:
+        award_tweets = json.load(f)
+    f.close()
 
-    gg_sw = []
-    sw = ['actor', 'actress', 'tv', 'television', 'series', 'film', 'comedy', 'drama', 'director']
-
-    process_tweets.main(year, award_tweets, sw)
+    processed_path = 'results/partial_gg' + year + '.json'
+    if not os.path.exists(processed_path):
+        process_tweets.main(year, award_tweets, sw)
 
     show = {
         'hosts': hosts,
-        'awards': awards
+        'awards': awards,
+        'best_dressed': best_dressed
     }
 
     winners = get_winner(year)
-    nominees = get_nominees(year, winners, award_list)
+    nominees = get_nominees(year)
     presenters = get_presenters(year)
 
     for award in award_list:
@@ -219,13 +260,16 @@ def view_results():
     print('Host(s):', ', '.join(data['hosts']))
     print('Awards:\n\t' + '\n\t'.join(data['awards']))
     for award in data:
-        if award in ['hosts', 'awards']:
+        if award in ['hosts', 'awards', 'best_dressed']:
             continue
 
         print(award)
         print('\tWinner:', data[award]['winner'])
         print('\tNominees:', ', '.join(data[award]['nominees']))
         print('\tPresenter:', data[award]['presenters'])
+    print('Best Dressed:', data['best_dressed'])
 
 if __name__ == '__main__':
+    pre_ceremony()
     main()
+    view_results()

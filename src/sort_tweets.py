@@ -53,4 +53,6 @@ def main(year, awards):
 					continue
 				award_tweets[award].append(tweet)
 
-	return award_tweets
+	with open('data/sorted_gg' + year + '.json', 'w+') as f:
+		json.dump(award_tweets, f)
+	f.close()
